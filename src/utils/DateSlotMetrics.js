@@ -1,5 +1,10 @@
 import memoize from 'memoize-one'
-import { eventSegments, endOfRange, eventLevels } from './eventLevels'
+import {
+  eventSegments,
+  endOfRange,
+  eventLevels,
+  splitSegments,
+} from './eventLevels'
 
 let isSegmentInSlot = (seg, slot) => seg.left <= slot && seg.right >= slot
 
@@ -14,6 +19,8 @@ export function getSlotMetrics() {
     let segments = events.map((evt) =>
       eventSegments(evt, range, accessors, localizer)
     )
+
+    segments = splitSegments(segments, localizer)
 
     let { levels, extra } = eventLevels(segments, Math.max(maxRows - 1, 1))
     // Subtract 1 from minRows to not include showMore button row when

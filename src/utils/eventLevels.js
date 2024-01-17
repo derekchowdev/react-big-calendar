@@ -89,3 +89,35 @@ export function sortEvents(eventA, eventB, accessors, localizer) {
   }
   return localizer.sortEvents({ evtA, evtB })
 }
+
+export function splitSegments(segments, localizer) {
+  const newSegments = []
+
+  segments.forEach((seg) => {
+    const diff = seg.right - seg.left
+    if (diff === 0) {
+      newSegments.push(seg)
+      return
+    }
+
+    if (diff > 1) {
+      throw new Error('Event is too long!')
+    }
+
+    newSegments.push({
+      event: { ...seg.event, end: localizer.endOf(seg.event.start, 'day') },
+      span: 1,
+      left: seg.left,
+      right: seg.right - 1,
+    })
+
+    newSegments.push({
+      event: { ...seg.event, start: localizer.startOf(seg.event.end, 'day') },
+      span: 1,
+      left: seg.left + 1,
+      right: seg.right,
+    })
+  })
+
+  return newSegments
+}
